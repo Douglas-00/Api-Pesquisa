@@ -16,6 +16,8 @@ model Search {
   deletedAt     DateTime? 
   questions     SearchQuestion[]
   responses     SearchResponse[]
+
+  @@unique([title, targetAudience])
 }
 
 model SearchQuestion {
@@ -34,7 +36,7 @@ model SearchResponse {
   searchId       String
   targetAudience String
   stars          Int       
-  contactEmail   String    @unique
+  contactEmail   String    
   responseDate   DateTime  @default(now())
   createdAt     DateTime   @default(now())
   updatedAt     DateTime?  @updatedAt

@@ -14,7 +14,7 @@ CREATE TABLE "Search" (
 CREATE TABLE "SearchQuestion" (
     "id" TEXT NOT NULL,
     "searchId" TEXT NOT NULL,
-    "question" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
     "deletedAt" TIMESTAMP(3),
@@ -38,7 +38,7 @@ CREATE TABLE "SearchResponse" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "SearchResponse_contactEmail_key" ON "SearchResponse"("contactEmail");
+CREATE UNIQUE INDEX "Search_title_targetAudience_key" ON "Search"("title", "targetAudience");
 
 -- AddForeignKey
 ALTER TABLE "SearchQuestion" ADD CONSTRAINT "SearchQuestion_searchId_fkey" FOREIGN KEY ("searchId") REFERENCES "Search"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -8,7 +8,7 @@ generator client {
 }
 
 model Search {
-  id            String         @id @default(uuid())
+  id             Int      @id @default(autoincrement())
   title         String
   targetAudience String
   createdAt     DateTime       @default(now())
@@ -21,24 +21,39 @@ model Search {
 }
 
 model SearchQuestion {
-  id       String @id @default(uuid())
+  id             Int      @id @default(autoincrement())
   search   Search @relation(fields: [searchId], references: [id])
-  searchId String
+  searchId Int
   name String
   createdAt     DateTime       @default(now())
   updatedAt     DateTime?      @updatedAt
   deletedAt     DateTime? 
+
+  questionResponses QuestionResponse[]
 }
 
 model SearchResponse {
-  id             String    @id @default(uuid())
+  id             Int      @id @default(autoincrement())
   search         Search    @relation(fields: [searchId], references: [id])
-  searchId       String
+  searchId       Int
   targetAudience String
   stars          Int       
-  contactEmail   String    
-  responseDate   DateTime  @default(now())
-  createdAt     DateTime   @default(now())
+  contactEmail   String  
+  createdAt     DateTime  @default(now())
   updatedAt     DateTime?  @updatedAt
   deletedAt     DateTime? 
+
+  questionResponses QuestionResponse[]
+}
+
+model QuestionResponse {
+  id             Int             @id @default(autoincrement())
+  searchQuestion SearchQuestion  @relation(fields: [questionId], references: [id])
+  questionId     Int
+  searchResponse SearchResponse  @relation(fields: [responseId], references: [id])
+  responseId     Int
+  answer         String?         
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime?       @updatedAt
+  deletedAt      DateTime?
 }

@@ -60,7 +60,7 @@ API para gerenciar pesquisas de satisfação de clientes com funcionalidades de 
    Certifique-se de que o arquivo `.env` contém as seguintes variáveis:
 
    ```
-   DATABASE_URL=postgresql://root:password@db:5432/search_db configurado já.
+   DATABASE_URL=postgresql://root:password@db:5432/search_db configurado no docker compose essas credenciais.
    ```
 
 3. **Iniciar o Projeto com Docker**

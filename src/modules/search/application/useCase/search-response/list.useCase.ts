@@ -2,10 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/db/prisma.service';
 import { ListSearchResponsesParamsDto } from 'src/modules/search/infra/dto/search-response/list/request.dto';
 import { ListSearchResponseDto } from 'src/modules/search/infra/dto/search-response/list/response.dto';
+import { AppLogger } from 'src/modules/logger/logger.service';
 
 @Injectable()
 export class ListSearchResponsesUseCase {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logger: AppLogger,
+  ) {}
 
   async execute(
     searchId: number,
@@ -18,6 +22,7 @@ export class ListSearchResponsesUseCase {
     });
 
     if (!existingSearch) {
+      this.logger.warn(`Search with ID ${searchId} not found`);
       throw new NotFoundException('Search not found');
     }
 
@@ -36,6 +41,10 @@ export class ListSearchResponsesUseCase {
       },
       orderBy: { stars: order },
     });
+
+    this.logger.log(
+      `Listed ${responses.length} responses for search ID ${searchId}`,
+    );
 
     return responses.map((response) => ({
       id: response.id,

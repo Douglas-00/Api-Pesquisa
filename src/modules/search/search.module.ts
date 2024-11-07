@@ -13,8 +13,9 @@ import { CreateSearchResponseUseCase } from './application/useCase/search-respon
 import { ListSearchResponsesUseCase } from './application/useCase/search-response/list.useCase';
 import { CreateSearchResponseController } from './infra/controllers/search-response/create.controller';
 import { ListSearchResponsesController } from './infra/controllers/search-response/list.controller';
-import { ExportSearchResponsesToCsvUseCase } from './application/useCase/search-response/exportCSV.useCase';
+
 import { ExportSearchResponsesController } from './infra/controllers/search-response/exportCSV.controller';
+import ExportSearchResponsesToCsvUseCase from './application/useCase/search-response/exportCSV.useCase';
 
 @Module({
   imports: [],

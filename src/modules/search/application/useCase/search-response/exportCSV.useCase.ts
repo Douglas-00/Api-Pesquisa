@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/db/prisma.service';
 import { parseAsync } from 'json2csv';
+import { AppLogger } from 'src/modules/logger/logger.service';
 
 @Injectable()
 export class ExportSearchResponsesToCsvUseCase {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logger: AppLogger,
+  ) {}
 
   async execute(searchId: number): Promise<string> {
     const search = await this.prisma.search.findUnique({
@@ -12,6 +16,7 @@ export class ExportSearchResponsesToCsvUseCase {
     });
 
     if (!search) {
+      this.logger.warn(`Search with ID ${searchId} not found`);
       throw new NotFoundException('Search not found');
     }
 
@@ -19,12 +24,14 @@ export class ExportSearchResponsesToCsvUseCase {
       where: { searchId },
       include: {
         questionResponses: {
-          include: {
-            searchQuestion: true,
-          },
+          include: { searchQuestion: true },
         },
       },
     });
+
+    this.logger.log(
+      `Fetched ${responses.length} responses for search ID ${searchId} for CSV export`,
+    );
 
     const csvData = responses
       .map((response) => {
@@ -48,18 +55,19 @@ export class ExportSearchResponsesToCsvUseCase {
       { label: 'Answer', value: 'answer' },
     ];
 
-    const options = {
-      fields,
-      withBOM: true,
-    };
-
-    let csv = '';
+    const options = { fields, withBOM: true };
 
     try {
-      csv = await parseAsync(csvData, options);
+      const csv = await parseAsync(csvData, options);
+      this.logger.log(`Successfully generated CSV for search ID ${searchId}`);
       return csv;
     } catch (error) {
-      throw new Error(`'Failed to generate CSV: ${error}`);
+      this.logger.error(
+        `Failed to generate CSV for search ID ${searchId}: ${error.message}`,
+      );
+      throw new Error(`Failed to generate CSV: ${error}`);
     }
   }
 }
+
+export default ExportSearchResponsesToCsvUseCase;

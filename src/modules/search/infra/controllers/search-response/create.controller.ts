@@ -22,7 +22,6 @@ export class CreateSearchResponseController {
     @Param('searchId', ParseIntPipe) searchId: number,
     @Body() payload: CreateSearchResponseRequestDto,
   ): Promise<CreateSearchResponseResponseDto> {
-    console.log(searchId);
     return await this.useCase.execute(searchId, payload);
   }
 }

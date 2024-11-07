@@ -2,10 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/db/prisma.service';
 import { CreateSearchResponseRequestDto } from 'src/modules/search/infra/dto/search-response/create/request.dto';
 import { CreateSearchResponseResponseDto } from 'src/modules/search/infra/dto/search-response/create/response.dto';
+import { AppLogger } from 'src/modules/logger/logger.service';
 
 @Injectable()
 export class CreateSearchResponseUseCase {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logger: AppLogger,
+  ) {}
 
   async execute(
     searchId: number,
@@ -16,6 +20,7 @@ export class CreateSearchResponseUseCase {
     });
 
     if (!search) {
+      this.logger.warn(`Search with ID ${searchId} not found`);
       throw new NotFoundException('Search not found');
     }
 
@@ -28,6 +33,10 @@ export class CreateSearchResponseUseCase {
       },
     });
 
+    this.logger.log(
+      `Response created with ID ${response.id} for search ID ${searchId}`,
+    );
+
     if (payload.answers && payload.answers.length > 0) {
       for (const answer of payload.answers) {
         const question = await this.prisma.searchQuestion.findFirst({
@@ -38,6 +47,9 @@ export class CreateSearchResponseUseCase {
         });
 
         if (!question) {
+          this.logger.warn(
+            `Question ${answer.questionId} not found for search ID ${searchId}`,
+          );
           throw new NotFoundException(
             `Question ${answer.questionId} Not Found!`,
           );
@@ -50,11 +62,13 @@ export class CreateSearchResponseUseCase {
             answer: answer.responseText,
           },
         });
+
+        this.logger.log(
+          `Answer recorded for question ID ${question.id} in response ID ${response.id}`,
+        );
       }
     }
 
-    return {
-      message: 'Response created successfully!',
-    };
+    return { message: 'Response created successfully!' };
   }
 }
